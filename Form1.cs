@@ -1,3 +1,11 @@
+using System;
+using System.Data;
+using System.Windows.Forms;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.HSSF.UserModel;
+using NPOI.HSSF.Record;
+
 namespace Excel2Wiki
 {
     public partial class Form1 : Form
@@ -25,7 +33,73 @@ namespace Excel2Wiki
 
         private void ImportFile(string fullpath)
         {
-            MessageBox.Show(fullpath);
+            IWorkbook workbook;
+            ISheet sheet;
+
+            using (var fileStream = new System.IO.FileStream(fullpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            {
+                if (fullpath.EndsWith(".xlsx"))
+                {
+                    workbook = new XSSFWorkbook(fileStream); // Per file .xlsx
+                }
+                else if (fullpath.EndsWith(".xls"))
+                {
+                    workbook = new HSSFWorkbook(fileStream); // Per file .xls
+                }
+                else
+                {
+                    throw new Exception("Unsupported file type");
+                }
+
+                int numberOfSheets = workbook.NumberOfSheets;
+                if (numberOfSheets > 1)
+                {
+                    MessageBox.Show("Warning, preadsheet document contains more than 1 sheet. Only first will be considered", "Warning, possible data loss", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                sheet = workbook.GetSheetAt(0);
+            }
+
+            //I have the data. Let's clean the grid
+            dgWikiTable.Rows.Clear();
+            dgWikiTable.Columns.Clear();
+
+            //start working on data
+            DataTable dt = new DataTable();
+
+            // Aggiungi le intestazioni delle colonne
+            IRow headerRow = sheet.GetRow(0);
+            int cellCount = headerRow.LastCellNum;
+
+            /*           if (chkFirstRowIsHeader.Checked)
+            {
+                for (int i = 0; i < cellCount; i++)
+                {
+                    dgWikiTable.Columns.Add(headerRow.GetCell(i).ToString(), headerRow.GetCell(i).ToString());
+                }
+            }
+            */
+
+            //add columns with no names
+            for (int i = 0; i < cellCount; i++)
+            {
+                dgWikiTable.Columns.Add("", "");
+            }
+
+            // Aggiungi le righe
+            for (int i = 0; i <= sheet.LastRowNum; i++)
+            {
+                IRow row = sheet.GetRow(i);
+                dgWikiTable.Rows.Add();
+
+                for (int j = 0; j < cellCount; j++)
+                {
+                    if (row.GetCell(j) != null)
+                    {
+                        // Qui puoi aggiungere la tua logica personalizzata
+                        dgWikiTable.Rows[i].Cells[j].Value = row.GetCell(j).ToString();
+                    }
+                }
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -59,7 +133,7 @@ namespace Excel2Wiki
 
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data is null) 
+            if (e.Data is null)
             {
                 return;
             }
@@ -83,7 +157,7 @@ namespace Excel2Wiki
                     string acceptedFilePath = filePath;
 
                     // Fai qualcosa con il percorso del file, ad esempio:
-                    MessageBox.Show($"Hai rilasciato il file: {acceptedFilePath}");
+                    ImportFile(acceptedFilePath);
                 }
                 else
                 {
@@ -91,5 +165,51 @@ namespace Excel2Wiki
                 }
             }
         }
+
+        private void cmdExport_Click(object sender, EventArgs e)
+        {
+            ExportTable();
+        }
+
+        private void ExportTable()
+        {
+            System.Text.StringBuilder WikiTable = new System.Text.StringBuilder();
+
+            // Aggiungi l'intestazione della tabella
+            WikiTable.AppendLine("{| class=\"wikitable\"");
+
+            // Se la prima riga è un'intestazione
+            if (chkFirstRowIsHeader.Checked)
+            {
+                AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[0], true);
+            }
+
+            // Loop sulle righe
+            int rowCount = dgWikiTable.AllowUserToAddRows ? dgWikiTable.Rows.Count - 1 : dgWikiTable.Rows.Count;
+            for (int rowCounter = chkFirstRowIsHeader.Checked ? 1 : 0; rowCounter < rowCount; rowCounter++)
+            {
+                AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[rowCounter], false);
+            }
+
+
+            // Chiudi la tabella
+            WikiTable.AppendLine("|}");
+
+            Clipboard.SetText(WikiTable.ToString());
+        }
+
+        private void AppendRowToWikiTable(System.Text.StringBuilder WikiTable, DataGridViewRow row, bool isHeader)
+        {
+            WikiTable.AppendLine("|-");
+
+            for (int colCounter = 0; colCounter < dgWikiTable.ColumnCount; colCounter++)
+            {
+                string cellValue = row.Cells[colCounter].Value?.ToString() ?? "";
+                string cellPrefix = isHeader ? "!" : "|";
+
+                WikiTable.AppendLine($"{cellPrefix} {cellValue}");
+            }
+        }
+
     }
 }
