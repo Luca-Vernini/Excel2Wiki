@@ -43,10 +43,14 @@
             cmdExport = new Button();
             grpImportOptions = new GroupBox();
             chkSkipBlankLines = new CheckBox();
+            stStrip = new StatusStrip();
+            progressOperation = new ToolStripProgressBar();
+            lblStatus = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgWikiTable).BeginInit();
             grpExportOptions.SuspendLayout();
             grpImportOptions.SuspendLayout();
+            stStrip.SuspendLayout();
             SuspendLayout();
             // 
             // openFileExcel
@@ -73,14 +77,14 @@
             // openToolStripMenuItem
             // 
             openToolStripMenuItem.Name = "openToolStripMenuItem";
-            openToolStripMenuItem.Size = new Size(180, 22);
+            openToolStripMenuItem.Size = new Size(103, 22);
             openToolStripMenuItem.Text = "Open";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(103, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -91,7 +95,7 @@
             dgWikiTable.Location = new Point(12, 131);
             dgWikiTable.Name = "dgWikiTable";
             dgWikiTable.RowTemplate.Height = 25;
-            dgWikiTable.Size = new Size(986, 358);
+            dgWikiTable.Size = new Size(986, 345);
             dgWikiTable.TabIndex = 1;
             // 
             // grpExportOptions
@@ -164,7 +168,7 @@
             grpImportOptions.Controls.Add(chkSkipBlankLines);
             grpImportOptions.Location = new Point(12, 27);
             grpImportOptions.Name = "grpImportOptions";
-            grpImportOptions.Size = new Size(279, 86);
+            grpImportOptions.Size = new Size(313, 86);
             grpImportOptions.TabIndex = 4;
             grpImportOptions.TabStop = false;
             grpImportOptions.Text = "Import Options";
@@ -181,11 +185,34 @@
             chkSkipBlankLines.Text = "Skip blank lines";
             chkSkipBlankLines.UseVisualStyleBackColor = true;
             // 
+            // stStrip
+            // 
+            stStrip.Items.AddRange(new ToolStripItem[] { lblStatus, progressOperation });
+            stStrip.Location = new Point(0, 479);
+            stStrip.Name = "stStrip";
+            stStrip.Size = new Size(1010, 22);
+            stStrip.TabIndex = 5;
+            stStrip.Text = "statusStrip1";
+            // 
+            // progressOperation
+            // 
+            progressOperation.Name = "progressOperation";
+            progressOperation.Size = new Size(100, 16);
+            progressOperation.Step = 1;
+            progressOperation.Style = ProgressBarStyle.Continuous;
+            // 
+            // lblStatus
+            // 
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(111, 17);
+            lblStatus.Text = "Operation progress:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1010, 501);
+            Controls.Add(stStrip);
             Controls.Add(grpImportOptions);
             Controls.Add(cmdExport);
             Controls.Add(grpExportOptions);
@@ -205,6 +232,8 @@
             grpExportOptions.PerformLayout();
             grpImportOptions.ResumeLayout(false);
             grpImportOptions.PerformLayout();
+            stStrip.ResumeLayout(false);
+            stStrip.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -225,5 +254,8 @@
         private CheckBox chkSortable;
         private GroupBox grpImportOptions;
         private CheckBox chkSkipBlankLines;
+        private StatusStrip stStrip;
+        private ToolStripStatusLabel lblStatus;
+        private ToolStripProgressBar progressOperation;
     }
 }

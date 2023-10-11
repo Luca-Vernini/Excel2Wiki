@@ -52,6 +52,11 @@ namespace Excel2Wiki
             IWorkbook workbook;
             ISheet sheet;
 
+            //Reset status bar components
+            progressOperation.Value = 0;
+            lblStatus.Text = "Import in progress";
+
+
             using (var fileStream = new System.IO.FileStream(fullpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
             {
                 if (fullpath.EndsWith(".xlsx"))
@@ -66,6 +71,10 @@ namespace Excel2Wiki
                 {
                     throw new Exception("Unsupported file type");
                 }
+
+                //Opening file is 5 percent of the work
+                progressOperation.Value = 5;
+                stStrip.Refresh();
 
                 int numberOfSheets = workbook.NumberOfSheets;
                 if (numberOfSheets > 1)
@@ -92,32 +101,44 @@ namespace Excel2Wiki
                 dgWikiTable.Columns.Add("", "");
             }
 
+            // Another 5% for the header
+            progressOperation.Value = 10;
+            stStrip.Refresh();
+
+            double mappedValue;
             // add the rows
             for (int i = 0; i <= sheet.LastRowNum; i++)
             {
                 IRow row = sheet.GetRow(i);
 
-                // Se il checkbox è selezionato e la riga è vuota, continua al prossimo ciclo
-                if (chkSkipBlankLines.Checked && IsRowEmpty(row))
+                // If the checkbox is not checked or the row is not empty, add the row to the DataGridView
+                if (!chkSkipBlankLines.Checked || !IsRowEmpty(row))
                 {
-                    continue;
-                }
+                    DataGridViewRow newRow = new DataGridViewRow();
+                    newRow.CreateCells(dgWikiTable);
 
-                DataGridViewRow newRow = new DataGridViewRow();
-                newRow.CreateCells(dgWikiTable);
-
-                for (int j = 0; j < cellCount; j++)
-                {
-                    if (row.GetCell(j) != null)
+                    for (int j = 0; j < cellCount; j++)
                     {
-                        // Qui puoi aggiungere la tua logica personalizzata
-                        newRow.Cells[j].Value = row.GetCell(j).ToString();
+                        if (row.GetCell(j) != null)
+                        {
+                            // add more logic here
+                            newRow.Cells[j].Value = row.GetCell(j).ToString();
+                        }
                     }
+
+                    dgWikiTable.Rows.Add(newRow);
                 }
 
-                dgWikiTable.Rows.Add(newRow);
+                // Update the progress bar based on the total number of rows processed
+                mappedValue = MapValue(i, 0, sheet.LastRowNum, 10, progressOperation.Maximum);
+                progressOperation.Value = (int)Math.Round(mappedValue);
+                stStrip.Refresh();
             }
 
+        }
+        public double MapValue(double input, double inputMin, double inputMax, double outputMin, double outputMax)
+        {
+            return outputMin + ((input - inputMin) / (inputMax - inputMin) * (outputMax - outputMin));
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
