@@ -35,14 +35,18 @@
             openToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             dgWikiTable = new DataGridView();
-            grpOptions = new GroupBox();
+            grpExportOptions = new GroupBox();
+            chkSortable = new CheckBox();
             radioOutClip = new RadioButton();
             radioOutFile = new RadioButton();
             chkFirstRowIsHeader = new CheckBox();
             cmdExport = new Button();
+            grpImportOptions = new GroupBox();
+            chkSkipBlankLines = new CheckBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgWikiTable).BeginInit();
-            grpOptions.SuspendLayout();
+            grpExportOptions.SuspendLayout();
+            grpImportOptions.SuspendLayout();
             SuspendLayout();
             // 
             // openFileExcel
@@ -90,17 +94,28 @@
             dgWikiTable.Size = new Size(986, 358);
             dgWikiTable.TabIndex = 1;
             // 
-            // grpOptions
+            // grpExportOptions
             // 
-            grpOptions.Controls.Add(radioOutClip);
-            grpOptions.Controls.Add(radioOutFile);
-            grpOptions.Controls.Add(chkFirstRowIsHeader);
-            grpOptions.Location = new Point(16, 28);
-            grpOptions.Name = "grpOptions";
-            grpOptions.Size = new Size(352, 86);
-            grpOptions.TabIndex = 2;
-            grpOptions.TabStop = false;
-            grpOptions.Text = "Options";
+            grpExportOptions.Controls.Add(chkSortable);
+            grpExportOptions.Controls.Add(radioOutClip);
+            grpExportOptions.Controls.Add(radioOutFile);
+            grpExportOptions.Controls.Add(chkFirstRowIsHeader);
+            grpExportOptions.Location = new Point(331, 27);
+            grpExportOptions.Name = "grpExportOptions";
+            grpExportOptions.Size = new Size(352, 86);
+            grpExportOptions.TabIndex = 2;
+            grpExportOptions.TabStop = false;
+            grpExportOptions.Text = "Export options";
+            // 
+            // chkSortable
+            // 
+            chkSortable.AutoSize = true;
+            chkSortable.Location = new Point(6, 47);
+            chkSortable.Name = "chkSortable";
+            chkSortable.Size = new Size(69, 19);
+            chkSortable.TabIndex = 3;
+            chkSortable.Text = "Sortable";
+            chkSortable.UseVisualStyleBackColor = true;
             // 
             // radioOutClip
             // 
@@ -136,7 +151,7 @@
             // 
             // cmdExport
             // 
-            cmdExport.Location = new Point(374, 36);
+            cmdExport.Location = new Point(840, 27);
             cmdExport.Name = "cmdExport";
             cmdExport.Size = new Size(100, 30);
             cmdExport.TabIndex = 3;
@@ -144,13 +159,36 @@
             cmdExport.UseVisualStyleBackColor = true;
             cmdExport.Click += cmdExport_Click;
             // 
+            // grpImportOptions
+            // 
+            grpImportOptions.Controls.Add(chkSkipBlankLines);
+            grpImportOptions.Location = new Point(12, 27);
+            grpImportOptions.Name = "grpImportOptions";
+            grpImportOptions.Size = new Size(279, 86);
+            grpImportOptions.TabIndex = 4;
+            grpImportOptions.TabStop = false;
+            grpImportOptions.Text = "Import Options";
+            // 
+            // chkSkipBlankLines
+            // 
+            chkSkipBlankLines.AutoSize = true;
+            chkSkipBlankLines.Checked = true;
+            chkSkipBlankLines.CheckState = CheckState.Checked;
+            chkSkipBlankLines.Location = new Point(6, 22);
+            chkSkipBlankLines.Name = "chkSkipBlankLines";
+            chkSkipBlankLines.Size = new Size(107, 19);
+            chkSkipBlankLines.TabIndex = 0;
+            chkSkipBlankLines.Text = "Skip blank lines";
+            chkSkipBlankLines.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1010, 501);
+            Controls.Add(grpImportOptions);
             Controls.Add(cmdExport);
-            Controls.Add(grpOptions);
+            Controls.Add(grpExportOptions);
             Controls.Add(dgWikiTable);
             Controls.Add(menuStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -163,8 +201,10 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgWikiTable).EndInit();
-            grpOptions.ResumeLayout(false);
-            grpOptions.PerformLayout();
+            grpExportOptions.ResumeLayout(false);
+            grpExportOptions.PerformLayout();
+            grpImportOptions.ResumeLayout(false);
+            grpImportOptions.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -177,10 +217,13 @@
         private ToolStripMenuItem openToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private DataGridView dgWikiTable;
-        private GroupBox grpOptions;
+        private GroupBox grpExportOptions;
         private CheckBox chkFirstRowIsHeader;
         private RadioButton radioOutClip;
         private RadioButton radioOutFile;
         private Button cmdExport;
+        private CheckBox chkSortable;
+        private GroupBox grpImportOptions;
+        private CheckBox chkSkipBlankLines;
     }
 }

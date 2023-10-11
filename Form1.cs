@@ -31,6 +31,22 @@ namespace Excel2Wiki
             }
         }
 
+        //this function just check if the line is empty
+        private bool IsRowEmpty(IRow row)
+        {
+            if (row == null) return true;
+
+            foreach (ICell cell in row)
+            {
+                if (cell != null && !string.IsNullOrWhiteSpace(cell.ToString()))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
         private void ImportFile(string fullpath)
         {
             IWorkbook workbook;
@@ -70,36 +86,38 @@ namespace Excel2Wiki
             IRow headerRow = sheet.GetRow(0);
             int cellCount = headerRow.LastCellNum;
 
-            /*           if (chkFirstRowIsHeader.Checked)
-            {
-                for (int i = 0; i < cellCount; i++)
-                {
-                    dgWikiTable.Columns.Add(headerRow.GetCell(i).ToString(), headerRow.GetCell(i).ToString());
-                }
-            }
-            */
-
             //add columns with no names
             for (int i = 0; i < cellCount; i++)
             {
                 dgWikiTable.Columns.Add("", "");
             }
 
-            // Aggiungi le righe
+            // add the rows
             for (int i = 0; i <= sheet.LastRowNum; i++)
             {
                 IRow row = sheet.GetRow(i);
-                dgWikiTable.Rows.Add();
+
+                // Se il checkbox è selezionato e la riga è vuota, continua al prossimo ciclo
+                if (chkSkipBlankLines.Checked && IsRowEmpty(row))
+                {
+                    continue;
+                }
+
+                DataGridViewRow newRow = new DataGridViewRow();
+                newRow.CreateCells(dgWikiTable);
 
                 for (int j = 0; j < cellCount; j++)
                 {
                     if (row.GetCell(j) != null)
                     {
                         // Qui puoi aggiungere la tua logica personalizzata
-                        dgWikiTable.Rows[i].Cells[j].Value = row.GetCell(j).ToString();
+                        newRow.Cells[j].Value = row.GetCell(j).ToString();
                     }
                 }
+
+                dgWikiTable.Rows.Add(newRow);
             }
+
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -176,7 +194,14 @@ namespace Excel2Wiki
             System.Text.StringBuilder WikiTable = new System.Text.StringBuilder();
 
             // Aggiungi l'intestazione della tabella
-            WikiTable.AppendLine("{| class=\"wikitable\"");
+            if (chkSortable.Checked)
+            {
+                WikiTable.AppendLine("{| class=\"wikitable sortable\"");
+            }
+            else
+            {
+                WikiTable.AppendLine("{| class=\"wikitable\"");
+            }
 
             // Se la prima riga è un'intestazione
             if (chkFirstRowIsHeader.Checked)
