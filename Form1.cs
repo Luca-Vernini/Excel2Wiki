@@ -212,6 +212,9 @@ namespace Excel2Wiki
 
         private void ExportTable()
         {
+            progressOperation.Value = 0;
+            double mappedValue;
+
             System.Text.StringBuilder WikiTable = new System.Text.StringBuilder();
 
             // Aggiungi l'intestazione della tabella
@@ -230,16 +233,20 @@ namespace Excel2Wiki
                 AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[0], true);
             }
 
+            progressOperation.Value = 1;
+
             // Loop sulle righe
             int rowCount = dgWikiTable.AllowUserToAddRows ? dgWikiTable.Rows.Count - 1 : dgWikiTable.Rows.Count;
             for (int rowCounter = chkFirstRowIsHeader.Checked ? 1 : 0; rowCounter < rowCount; rowCounter++)
             {
                 AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[rowCounter], false);
+                mappedValue = MapValue(rowCount, 0, dgWikiTable.RowCount, 1, progressOperation.Maximum);
+                progressOperation.Value = (int)Math.Round(mappedValue);
             }
-
 
             // Chiudi la tabella
             WikiTable.AppendLine("|}");
+            progressOperation.Value = 100;
 
             Clipboard.SetText(WikiTable.ToString());
         }

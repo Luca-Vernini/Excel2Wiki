@@ -44,8 +44,9 @@
             grpImportOptions = new GroupBox();
             chkSkipBlankLines = new CheckBox();
             stStrip = new StatusStrip();
-            progressOperation = new ToolStripProgressBar();
             lblStatus = new ToolStripStatusLabel();
+            progressOperation = new ToolStripProgressBar();
+            chkMantainColors = new CheckBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgWikiTable).BeginInit();
             grpExportOptions.SuspendLayout();
@@ -92,21 +93,22 @@
             // 
             dgWikiTable.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgWikiTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgWikiTable.Location = new Point(12, 131);
+            dgWikiTable.Location = new Point(12, 128);
             dgWikiTable.Name = "dgWikiTable";
             dgWikiTable.RowTemplate.Height = 25;
-            dgWikiTable.Size = new Size(986, 345);
+            dgWikiTable.Size = new Size(986, 348);
             dgWikiTable.TabIndex = 1;
             // 
             // grpExportOptions
             // 
+            grpExportOptions.Controls.Add(chkMantainColors);
             grpExportOptions.Controls.Add(chkSortable);
             grpExportOptions.Controls.Add(radioOutClip);
             grpExportOptions.Controls.Add(radioOutFile);
             grpExportOptions.Controls.Add(chkFirstRowIsHeader);
             grpExportOptions.Location = new Point(331, 27);
             grpExportOptions.Name = "grpExportOptions";
-            grpExportOptions.Size = new Size(352, 86);
+            grpExportOptions.Size = new Size(352, 95);
             grpExportOptions.TabIndex = 2;
             grpExportOptions.TabStop = false;
             grpExportOptions.Text = "Export options";
@@ -125,7 +127,7 @@
             // 
             radioOutClip.AutoSize = true;
             radioOutClip.Checked = true;
-            radioOutClip.Location = new Point(176, 44);
+            radioOutClip.Location = new Point(176, 42);
             radioOutClip.Name = "radioOutClip";
             radioOutClip.Size = new Size(130, 19);
             radioOutClip.TabIndex = 2;
@@ -136,7 +138,7 @@
             // radioOutFile
             // 
             radioOutFile.AutoSize = true;
-            radioOutFile.Location = new Point(176, 19);
+            radioOutFile.Location = new Point(176, 22);
             radioOutFile.Name = "radioOutFile";
             radioOutFile.Size = new Size(96, 19);
             radioOutFile.TabIndex = 1;
@@ -168,7 +170,7 @@
             grpImportOptions.Controls.Add(chkSkipBlankLines);
             grpImportOptions.Location = new Point(12, 27);
             grpImportOptions.Name = "grpImportOptions";
-            grpImportOptions.Size = new Size(313, 86);
+            grpImportOptions.Size = new Size(313, 95);
             grpImportOptions.TabIndex = 4;
             grpImportOptions.TabStop = false;
             grpImportOptions.Text = "Import Options";
@@ -194,6 +196,12 @@
             stStrip.TabIndex = 5;
             stStrip.Text = "statusStrip1";
             // 
+            // lblStatus
+            // 
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(111, 17);
+            lblStatus.Text = "Operation progress:";
+            // 
             // progressOperation
             // 
             progressOperation.Name = "progressOperation";
@@ -201,11 +209,15 @@
             progressOperation.Step = 1;
             progressOperation.Style = ProgressBarStyle.Continuous;
             // 
-            // lblStatus
+            // chkMantainColors
             // 
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(111, 17);
-            lblStatus.Text = "Operation progress:";
+            chkMantainColors.AutoSize = true;
+            chkMantainColors.Location = new Point(6, 72);
+            chkMantainColors.Name = "chkMantainColors";
+            chkMantainColors.Size = new Size(105, 19);
+            chkMantainColors.TabIndex = 1;
+            chkMantainColors.Text = "Mantain colors";
+            chkMantainColors.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -257,5 +269,6 @@
         private StatusStrip stStrip;
         private ToolStripStatusLabel lblStatus;
         private ToolStripProgressBar progressOperation;
+        private CheckBox chkMantainColors;
     }
 }
