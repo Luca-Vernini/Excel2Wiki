@@ -16,6 +16,10 @@ namespace Excel2Wiki
 
             //enable drag and drop
             this.AllowDrop = true;
+
+            //work in progress, for now let buttons invisible
+            cmdForeColor.Visible = false;
+            cmdBackColor.Visible = false;
         }
 
         private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -101,6 +105,9 @@ namespace Excel2Wiki
                 dgWikiTable.Columns.Add("", "");
             }
 
+            // Set the columns to NOT sortable
+            foreach (DataGridViewColumn c in dgWikiTable.Columns) { c.SortMode = DataGridViewColumnSortMode.NotSortable;}
+
             // Another 5% for the header
             progressOperation.Value = 10;
             stStrip.Refresh();
@@ -122,7 +129,12 @@ namespace Excel2Wiki
                         if (row.GetCell(j) != null)
                         {
                             // add more logic here
-                            newRow.Cells[j].Value = row.GetCell(j).ToString();
+                            ICell cell = row.GetCell(j);
+                            newRow.Cells[j].Value = cell.ToString();// row.GetCell(j).ToString();
+                            if (cell.CellStyle != null)
+                            {
+
+                            }
                         }
                     }
 
@@ -212,6 +224,7 @@ namespace Excel2Wiki
 
         private void ExportTable()
         {
+            lblStatus.Text = "Export in progress:";
             progressOperation.Value = 0;
             double mappedValue;
 
@@ -225,6 +238,12 @@ namespace Excel2Wiki
             else
             {
                 WikiTable.AppendLine("{| class=\"wikitable\"");
+            }
+
+            // Caption se e' stata scritta
+            if (txtCaption.Text.Trim().Length > 0)
+            {
+                WikiTable.AppendLine("|+ " + txtCaption.Text);
             }
 
             // Se la prima riga è un'intestazione
@@ -264,5 +283,51 @@ namespace Excel2Wiki
             }
         }
 
+        private void cmdBackColor_Click(object sender, EventArgs e)
+        {
+            Color? selectedColor = PickAColor();
+            if (selectedColor.HasValue)
+            {
+                if (dgWikiTable.Rows.Count > 0)
+                {
+                    foreach (DataGridViewCell cell in dgWikiTable.Rows[0].Cells)
+                    {
+                        cell.Style.BackColor = selectedColor.Value;
+                    }
+                }
+            }
+        }
+
+        private Color? PickAColor()
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                return (colorDialog.Color);
+            }
+
+            return null;
+        }
+
+        private void chkFirstRowIsHeader_CheckedChanged(object sender, EventArgs e)
+        {
+            cmdBackColor.Enabled = chkFirstRowIsHeader.Checked;
+            cmdForeColor.Enabled = chkFirstRowIsHeader.Checked;
+        }
+
+        private void cmdForeColor_Click(object sender, EventArgs e)
+        {
+            Color? selectedColor = PickAColor();
+            if (selectedColor.HasValue)
+            {
+                if (dgWikiTable.Rows.Count > 0)
+                {
+                    foreach (DataGridViewCell cell in dgWikiTable.Rows[0].Cells)
+                    {
+                        cell.Style.ForeColor = selectedColor.Value;
+                    }
+                }
+            }
+        }
     }
 }

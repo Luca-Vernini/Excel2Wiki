@@ -36,6 +36,9 @@
             exitToolStripMenuItem = new ToolStripMenuItem();
             dgWikiTable = new DataGridView();
             grpExportOptions = new GroupBox();
+            cmdForeColor = new Button();
+            cmdBackColor = new Button();
+            chkMantainColors = new CheckBox();
             chkSortable = new CheckBox();
             radioOutClip = new RadioButton();
             radioOutFile = new RadioButton();
@@ -46,7 +49,9 @@
             stStrip = new StatusStrip();
             lblStatus = new ToolStripStatusLabel();
             progressOperation = new ToolStripProgressBar();
-            chkMantainColors = new CheckBox();
+            label1 = new Label();
+            txtCaption = new TextBox();
+            colorDialogMain = new ColorDialog();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgWikiTable).BeginInit();
             grpExportOptions.SuspendLayout();
@@ -93,14 +98,16 @@
             // 
             dgWikiTable.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgWikiTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgWikiTable.Location = new Point(12, 128);
+            dgWikiTable.Location = new Point(12, 164);
             dgWikiTable.Name = "dgWikiTable";
             dgWikiTable.RowTemplate.Height = 25;
-            dgWikiTable.Size = new Size(986, 348);
+            dgWikiTable.Size = new Size(986, 312);
             dgWikiTable.TabIndex = 1;
             // 
             // grpExportOptions
             // 
+            grpExportOptions.Controls.Add(cmdForeColor);
+            grpExportOptions.Controls.Add(cmdBackColor);
             grpExportOptions.Controls.Add(chkMantainColors);
             grpExportOptions.Controls.Add(chkSortable);
             grpExportOptions.Controls.Add(radioOutClip);
@@ -112,6 +119,38 @@
             grpExportOptions.TabIndex = 2;
             grpExportOptions.TabStop = false;
             grpExportOptions.Text = "Export options";
+            // 
+            // cmdForeColor
+            // 
+            cmdForeColor.Enabled = false;
+            cmdForeColor.Location = new Point(263, 18);
+            cmdForeColor.Name = "cmdForeColor";
+            cmdForeColor.Size = new Size(83, 23);
+            cmdForeColor.TabIndex = 5;
+            cmdForeColor.Text = "Fore Color";
+            cmdForeColor.UseVisualStyleBackColor = true;
+            cmdForeColor.Click += cmdForeColor_Click;
+            // 
+            // cmdBackColor
+            // 
+            cmdBackColor.Enabled = false;
+            cmdBackColor.Location = new Point(175, 18);
+            cmdBackColor.Name = "cmdBackColor";
+            cmdBackColor.Size = new Size(83, 23);
+            cmdBackColor.TabIndex = 4;
+            cmdBackColor.Text = "Back Color";
+            cmdBackColor.UseVisualStyleBackColor = true;
+            cmdBackColor.Click += cmdBackColor_Click;
+            // 
+            // chkMantainColors
+            // 
+            chkMantainColors.AutoSize = true;
+            chkMantainColors.Location = new Point(6, 72);
+            chkMantainColors.Name = "chkMantainColors";
+            chkMantainColors.Size = new Size(105, 19);
+            chkMantainColors.TabIndex = 1;
+            chkMantainColors.Text = "Mantain colors";
+            chkMantainColors.UseVisualStyleBackColor = true;
             // 
             // chkSortable
             // 
@@ -127,7 +166,7 @@
             // 
             radioOutClip.AutoSize = true;
             radioOutClip.Checked = true;
-            radioOutClip.Location = new Point(176, 42);
+            radioOutClip.Location = new Point(175, 70);
             radioOutClip.Name = "radioOutClip";
             radioOutClip.Size = new Size(130, 19);
             radioOutClip.TabIndex = 2;
@@ -138,7 +177,7 @@
             // radioOutFile
             // 
             radioOutFile.AutoSize = true;
-            radioOutFile.Location = new Point(176, 22);
+            radioOutFile.Location = new Point(175, 50);
             radioOutFile.Name = "radioOutFile";
             radioOutFile.Size = new Size(96, 19);
             radioOutFile.TabIndex = 1;
@@ -154,10 +193,12 @@
             chkFirstRowIsHeader.TabIndex = 0;
             chkFirstRowIsHeader.Text = "First row as header";
             chkFirstRowIsHeader.UseVisualStyleBackColor = true;
+            chkFirstRowIsHeader.CheckedChanged += chkFirstRowIsHeader_CheckedChanged;
             // 
             // cmdExport
             // 
-            cmdExport.Location = new Point(840, 27);
+            cmdExport.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmdExport.Location = new Point(898, 27);
             cmdExport.Name = "cmdExport";
             cmdExport.Size = new Size(100, 30);
             cmdExport.TabIndex = 3;
@@ -209,21 +250,29 @@
             progressOperation.Step = 1;
             progressOperation.Style = ProgressBarStyle.Continuous;
             // 
-            // chkMantainColors
+            // label1
             // 
-            chkMantainColors.AutoSize = true;
-            chkMantainColors.Location = new Point(6, 72);
-            chkMantainColors.Name = "chkMantainColors";
-            chkMantainColors.Size = new Size(105, 19);
-            chkMantainColors.TabIndex = 1;
-            chkMantainColors.Text = "Mantain colors";
-            chkMantainColors.UseVisualStyleBackColor = true;
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 131);
+            label1.Name = "label1";
+            label1.Size = new Size(272, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Write a caption here, if you want it on top of table:";
+            // 
+            // txtCaption
+            // 
+            txtCaption.Location = new Point(290, 128);
+            txtCaption.Name = "txtCaption";
+            txtCaption.Size = new Size(393, 23);
+            txtCaption.TabIndex = 7;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1010, 501);
+            Controls.Add(txtCaption);
+            Controls.Add(label1);
             Controls.Add(stStrip);
             Controls.Add(grpImportOptions);
             Controls.Add(cmdExport);
@@ -270,5 +319,10 @@
         private ToolStripStatusLabel lblStatus;
         private ToolStripProgressBar progressOperation;
         private CheckBox chkMantainColors;
+        private Label label1;
+        private TextBox txtCaption;
+        private ColorDialog colorDialogMain;
+        private Button cmdBackColor;
+        private Button cmdForeColor;
     }
 }
