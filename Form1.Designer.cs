@@ -177,6 +177,7 @@
             // radioOutFile
             // 
             radioOutFile.AutoSize = true;
+            radioOutFile.Enabled = false;
             radioOutFile.Location = new Point(175, 50);
             radioOutFile.Name = "radioOutFile";
             radioOutFile.Size = new Size(96, 19);

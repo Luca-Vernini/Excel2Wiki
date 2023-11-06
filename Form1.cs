@@ -106,7 +106,7 @@ namespace Excel2Wiki
             }
 
             // Set the columns to NOT sortable
-            foreach (DataGridViewColumn c in dgWikiTable.Columns) { c.SortMode = DataGridViewColumnSortMode.NotSortable;}
+            foreach (DataGridViewColumn c in dgWikiTable.Columns) { c.SortMode = DataGridViewColumnSortMode.NotSortable; }
 
             // Another 5% for the header
             progressOperation.Value = 10;
@@ -146,6 +146,8 @@ namespace Excel2Wiki
                 progressOperation.Value = (int)Math.Round(mappedValue);
                 stStrip.Refresh();
             }
+            lblStatus.Text = "Import complete";
+            stStrip.Refresh();
 
         }
         public double MapValue(double input, double inputMin, double inputMax, double outputMin, double outputMax)
@@ -261,11 +263,14 @@ namespace Excel2Wiki
                 AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[rowCounter], false);
                 mappedValue = MapValue(rowCount, 0, dgWikiTable.RowCount, 1, progressOperation.Maximum);
                 progressOperation.Value = (int)Math.Round(mappedValue);
+                stStrip.Refresh();
             }
 
             // Chiudi la tabella
             WikiTable.AppendLine("|}");
             progressOperation.Value = 100;
+            lblStatus.Text = "Export complete";
+            stStrip.Refresh();
 
             Clipboard.SetText(WikiTable.ToString());
         }
