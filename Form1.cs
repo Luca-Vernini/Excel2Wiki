@@ -10,10 +10,15 @@ namespace Excel2Wiki
 {
     public partial class Form1 : Form
     {
+        private ExcelProcessor excelProcessor;
+        private WikiTableGenerator wikiTableGenerator;
+
         public Form1()
         {
             InitializeComponent();
 
+            excelProcessor = new ExcelProcessor();
+            wikiTableGenerator = new WikiTableGenerator();
             //enable drag and drop
             this.AllowDrop = true;
 
@@ -50,106 +55,24 @@ namespace Excel2Wiki
             return true;
         }
 
-
-        private void ImportFile(string fullpath)
+        private void ImportFile(string fullPath)
         {
-            IWorkbook workbook;
-            ISheet sheet;
-
-            //Reset status bar components
-            progressOperation.Value = 0;
-            lblStatus.Text = "Import in progress";
-
-
-            using (var fileStream = new System.IO.FileStream(fullpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            try
             {
-                if (fullpath.EndsWith(".xlsx"))
-                {
-                    workbook = new XSSFWorkbook(fileStream); // Per file .xlsx
-                }
-                else if (fullpath.EndsWith(".xls"))
-                {
-                    workbook = new HSSFWorkbook(fileStream); // Per file .xls
-                }
-                else
-                {
-                    throw new Exception("Unsupported file type");
-                }
+                var dataTable = excelProcessor.ImportFile(fullPath, chkSkipBlankLines.Checked);
 
-                //Opening file is 5 percent of the work
-                progressOperation.Value = 5;
-                stStrip.Refresh();
+                // Mostra i dati nel DataGridView
+                dgWikiTable.DataSource = dataTable;
 
-                int numberOfSheets = workbook.NumberOfSheets;
-                if (numberOfSheets > 1)
-                {
-                    MessageBox.Show("Warning, preadsheet document contains more than 1 sheet. Only first will be considered", "Warning, possible data loss", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                sheet = workbook.GetSheetAt(0);
-            }
-
-            //I have the data. Let's clean the grid
-            dgWikiTable.Rows.Clear();
-            dgWikiTable.Columns.Clear();
-
-            //start working on data
-            DataTable dt = new DataTable();
-
-            // Aggiungi le intestazioni delle colonne
-            IRow headerRow = sheet.GetRow(0);
-            int cellCount = headerRow.LastCellNum;
-
-            //add columns with no names
-            for (int i = 0; i < cellCount; i++)
-            {
-                dgWikiTable.Columns.Add("", "");
-            }
-
-            // Set the columns to NOT sortable
-            foreach (DataGridViewColumn c in dgWikiTable.Columns) { c.SortMode = DataGridViewColumnSortMode.NotSortable; }
-
-            // Another 5% for the header
-            progressOperation.Value = 10;
-            stStrip.Refresh();
-
-            double mappedValue;
-            // add the rows
-            for (int i = 0; i <= sheet.LastRowNum; i++)
-            {
-                IRow row = sheet.GetRow(i);
-
-                // If the checkbox is not checked or the row is not empty, add the row to the DataGridView
-                if (!chkSkipBlankLines.Checked || !IsRowEmpty(row))
-                {
-                    DataGridViewRow newRow = new DataGridViewRow();
-                    newRow.CreateCells(dgWikiTable);
-
-                    for (int j = 0; j < cellCount; j++)
-                    {
-                        if (row.GetCell(j) != null)
-                        {
-                            // add more logic here
-                            ICell cell = row.GetCell(j);
-                            newRow.Cells[j].Value = cell.ToString();// row.GetCell(j).ToString();
-                            if (cell.CellStyle != null)
-                            {
-
-                            }
-                        }
-                    }
-
-                    dgWikiTable.Rows.Add(newRow);
-                }
-
-                // Update the progress bar based on the total number of rows processed
-                mappedValue = MapValue(i, 0, sheet.LastRowNum, 10, progressOperation.Maximum);
-                progressOperation.Value = (int)Math.Round(mappedValue);
+                lblStatus.Text = "Import complete";
                 stStrip.Refresh();
             }
-            lblStatus.Text = "Import complete";
-            stStrip.Refresh();
-
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Errore durante l'importazione: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
         public double MapValue(double input, double inputMin, double inputMax, double outputMin, double outputMax)
         {
             return outputMin + ((input - inputMin) / (inputMax - inputMin) * (outputMax - outputMin));
@@ -228,54 +151,58 @@ namespace Excel2Wiki
         {
             lblStatus.Text = "Export in progress:";
             progressOperation.Value = 0;
-            double mappedValue;
 
-            System.Text.StringBuilder WikiTable = new System.Text.StringBuilder();
+            // Crea un'istanza di WikiTableGenerator
+            var generator = new WikiTableGenerator();
 
-            // Aggiungi l'intestazione della tabella
-            if (chkSortable.Checked)
+            // Genera la tabella Wiki
+            string wikiTable = generator.GenerateWikiTable(
+                dgWikiTable,
+                chkSortable.Checked,
+                chkFirstRowIsHeader.Checked,
+                txtCaption.Text
+            );
+
+            // Decidi dove esportare in base al RadioButton selezionato
+            if (radioOutClip.Checked)
             {
-                WikiTable.AppendLine("{| class=\"wikitable sortable\"");
+                Clipboard.SetText(wikiTable);
+                MessageBox.Show("La tabella è stata copiata negli appunti!", "Esportazione completata", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else
+            else if (radioOutFile.Checked)
             {
-                WikiTable.AppendLine("{| class=\"wikitable\"");
-            }
-
-            // Caption se e' stata scritta
-            if (txtCaption.Text.Trim().Length > 0)
-            {
-                WikiTable.AppendLine("|+ " + txtCaption.Text);
-            }
-
-            // Se la prima riga è un'intestazione
-            if (chkFirstRowIsHeader.Checked)
-            {
-                AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[0], true);
+                SaveToFile(wikiTable);
             }
 
-            progressOperation.Value = 1;
-
-            // Loop sulle righe
-            int rowCount = dgWikiTable.AllowUserToAddRows ? dgWikiTable.Rows.Count - 1 : dgWikiTable.Rows.Count;
-            for (int rowCounter = chkFirstRowIsHeader.Checked ? 1 : 0; rowCounter < rowCount; rowCounter++)
-            {
-                AppendRowToWikiTable(WikiTable, dgWikiTable.Rows[rowCounter], false);
-                mappedValue = MapValue(rowCount, 0, dgWikiTable.RowCount, 1, progressOperation.Maximum);
-                progressOperation.Value = (int)Math.Round(mappedValue);
-                stStrip.Refresh();
-            }
-
-            // Chiudi la tabella
-            WikiTable.AppendLine("|}");
-            progressOperation.Value = 100;
             lblStatus.Text = "Export complete";
+            progressOperation.Value = 100;
             stStrip.Refresh();
-
-            Clipboard.SetText(WikiTable.ToString());
         }
 
-        private void AppendRowToWikiTable(System.Text.StringBuilder WikiTable, DataGridViewRow row, bool isHeader)
+        private void SaveToFile(string wikiTable)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+                saveFileDialog.Title = "Save Wiki Table";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        System.IO.File.WriteAllText(saveFileDialog.FileName, wikiTable);
+                        MessageBox.Show("File salvato con successo!", "Esportazione completata", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Errore durante il salvataggio del file: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+
+        /*private void AppendRowToWikiTable(System.Text.StringBuilder WikiTable, DataGridViewRow row, bool isHeader)
         {
             WikiTable.AppendLine("|-");
 
@@ -286,7 +213,7 @@ namespace Excel2Wiki
 
                 WikiTable.AppendLine($"{cellPrefix} {cellValue}");
             }
-        }
+        }*/
 
         private void cmdBackColor_Click(object sender, EventArgs e)
         {

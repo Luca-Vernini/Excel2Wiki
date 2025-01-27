@@ -129,6 +129,7 @@
             cmdForeColor.TabIndex = 5;
             cmdForeColor.Text = "Fore Color";
             cmdForeColor.UseVisualStyleBackColor = true;
+            cmdForeColor.Visible = false;
             cmdForeColor.Click += cmdForeColor_Click;
             // 
             // cmdBackColor
@@ -140,6 +141,7 @@
             cmdBackColor.TabIndex = 4;
             cmdBackColor.Text = "Back Color";
             cmdBackColor.UseVisualStyleBackColor = true;
+            cmdBackColor.Visible = false;
             cmdBackColor.Click += cmdBackColor_Click;
             // 
             // chkMantainColors
@@ -151,6 +153,7 @@
             chkMantainColors.TabIndex = 1;
             chkMantainColors.Text = "Mantain colors";
             chkMantainColors.UseVisualStyleBackColor = true;
+            chkMantainColors.Visible = false;
             // 
             // chkSortable
             // 
@@ -177,7 +180,6 @@
             // radioOutFile
             // 
             radioOutFile.AutoSize = true;
-            radioOutFile.Enabled = false;
             radioOutFile.Location = new Point(175, 50);
             radioOutFile.Name = "radioOutFile";
             radioOutFile.Size = new Size(96, 19);
